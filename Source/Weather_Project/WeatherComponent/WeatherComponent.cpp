@@ -17,7 +17,7 @@ void UWeatherComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	StartWeatherTimer();
+	StartWeatherTimer(CurrentWeatherState);
 }
 
 void UWeatherComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -29,6 +29,8 @@ void UWeatherComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 void UWeatherComponent::ChangeWeatherState(EWeatherState NewState)
 {
 	CurrentWeatherState = NewState;
+	UE_LOG(LogTemp, Warning, TEXT("State: %s, TotalTimeValue: %f"),
+		*UEnum::GetValueAsString(CurrentWeatherState), TotalTimeValue);
 	OnWeatherStateChanged.Broadcast(NewState, TotalTimeValue);
 }
 
@@ -42,14 +44,14 @@ void UWeatherComponent::OnWeatherTimerEnd()
 		NextState = (uint8)EWeatherState::Calm;
 	}
 
-	ChangeWeatherState((EWeatherState)NextState);
+	StartWeatherTimer((EWeatherState)NextState);
 
-	StartWeatherTimer();
+	ChangeWeatherState((EWeatherState)NextState);
 }
 
-void UWeatherComponent::StartWeatherTimer()
+void UWeatherComponent::StartWeatherTimer(EWeatherState TargetState)
 {
-	const FWeatherStateRow* Row = UWeatherFunctionLibrary::GetWeatherStateData(CurrentWeatherState, WeatherDataTable);
+	const FWeatherStateRow* Row = UWeatherFunctionLibrary::GetWeatherStateData(TargetState, WeatherDataTable);
 
 	float TimeValue = 0.0f;
 

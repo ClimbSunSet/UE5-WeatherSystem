@@ -49,7 +49,7 @@ private:
 private:
 	void OnWeatherTimerEnd();
 
-	void StartWeatherTimer();
+	void StartWeatherTimer(EWeatherState TargetState);
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };
