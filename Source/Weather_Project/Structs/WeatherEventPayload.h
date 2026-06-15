@@ -1,27 +1,26 @@
-﻿// WeatherStateRow.h
+﻿// WeatherEventPayload.h
 
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Engine/DataTable.h"
-#include "WeatherStateRow.generated.h"
+
+#include "Enums/WeatherState/WeatherState.h"
+
+#include "WeatherEventPayload.generated.h"
 
 USTRUCT(BlueprintType)
-struct FWeatherStateRow : public FTableRowBase
+struct FWeatherEventPayload
 {
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float WeatherBaseDuration = 0.0f;
+	EWeatherState WeatherState = EWeatherState::Calm;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float RandomScale = 0.0f;
+	float TotalTimeValue = 0.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float BlendTime = 0.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float WeatherIntensity = 0.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float ParticleSpawnRate = 0.0f;

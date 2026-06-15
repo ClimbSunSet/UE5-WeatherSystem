@@ -17,7 +17,10 @@ void UWeatherComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	StartWeatherTimer(CurrentWeatherState);
+	GetWorld()->GetTimerManager().SetTimerForNextTick([this]()
+		{
+			ChangeWeatherState(StartWeatherTimer(CurrentWeatherState));
+		});
 }
 
 void UWeatherComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -26,12 +29,13 @@ void UWeatherComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 
 }
 
-void UWeatherComponent::ChangeWeatherState(EWeatherState NewState)
+void UWeatherComponent::ChangeWeatherState(FWeatherEventPayload NewWeatherEventPayload)
 {
-	CurrentWeatherState = NewState;
+	CurrentWeatherState = NewWeatherEventPayload.WeatherState;
 	UE_LOG(LogTemp, Warning, TEXT("State: %s, TotalTimeValue: %f"),
-		*UEnum::GetValueAsString(CurrentWeatherState), TotalTimeValue);
-	OnWeatherStateChanged.Broadcast(NewState, TotalTimeValue);
+		*UEnum::GetValueAsString(NewWeatherEventPayload.WeatherState), NewWeatherEventPayload.TotalTimeValue);
+	
+	OnWeatherStateChanged.Broadcast(NewWeatherEventPayload);
 }
 
 
@@ -39,19 +43,21 @@ void UWeatherComponent::OnWeatherTimerEnd()
 {
 	uint8 NextState = (uint8)CurrentWeatherState + 1;
 
-	if (NextState > (uint8)EWeatherState::Decrease)
+	if (NextState >= (uint8)EWeatherState::Max)
 	{
 		NextState = (uint8)EWeatherState::Calm;
 	}
-
-	StartWeatherTimer((EWeatherState)NextState);
-
-	ChangeWeatherState((EWeatherState)NextState);
+	
+	ChangeWeatherState(StartWeatherTimer((EWeatherState)NextState));
 }
 
-void UWeatherComponent::StartWeatherTimer(EWeatherState TargetState)
+FWeatherEventPayload UWeatherComponent::StartWeatherTimer(EWeatherState TargetState)
 {
-	const FWeatherStateRow* Row = UWeatherFunctionLibrary::GetWeatherStateData(TargetState, WeatherDataTable);
+	FWeatherEventPayload WeatherEventPayload;
+
+	WeatherEventPayload.WeatherState = TargetState;
+
+	const FWeatherStateRow* Row = UWeatherFunctionLibrary::GetWeatherStateData(WeatherEventPayload.WeatherState, WeatherDataTable);
 
 	float TimeValue = 0.0f;
 
@@ -61,19 +67,23 @@ void UWeatherComponent::StartWeatherTimer(EWeatherState TargetState)
 		float Max = Row->WeatherBaseDuration * (1.0f + Row->RandomScale);
 		TimeValue = FMath::FRandRange(Min, Max);
 
-		TotalTimeValue = TimeValue;
+		WeatherEventPayload.ParticleSpawnRate = Row->ParticleSpawnRate;
+		WeatherEventPayload.BlendTime = Row->BlendTime;
+		WeatherEventPayload.TotalTimeValue = TimeValue;
 	}
 	else
 	{
-		return;
+		return WeatherEventPayload;
 	}
 
 	if (TimeValue <= 0.0f)
 	{
-		return;
+		return WeatherEventPayload;
 	}
 
-	GetWorld()->GetTimerManager().SetTimer(WeatherTimer, this, &UWeatherComponent::OnWeatherTimerEnd, TimeValue, false);
+	GetWorld()->GetTimerManager().SetTimer(WeatherTimer, this, &UWeatherComponent::OnWeatherTimerEnd, WeatherEventPayload.TotalTimeValue, false);
+	
+	return WeatherEventPayload;
 }
 
 void UWeatherComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

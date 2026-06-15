@@ -8,10 +8,11 @@
 
 #include "Enums/WeatherState/WeatherState.h"
 #include "DataTable/WeatherStateRow.h"
+#include "Structs/WeatherEventPayload.h"
 
 #include "WeatherComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWeatherStateChanged, EWeatherState, WeatherState, float, TotalTimeValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeatherStateChanged, FWeatherEventPayload, WeatherEventPayload);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent), Blueprintable)
 class WEATHER_PROJECT_API UWeatherComponent : public UActorComponent
@@ -33,7 +34,7 @@ public:
 
 public:
 	UFUNCTION()
-	void ChangeWeatherState(EWeatherState NewState);
+	void ChangeWeatherState(FWeatherEventPayload NewWeatherEventPayload);
 
 private:
 	UPROPERTY(Replicated)
@@ -44,12 +45,10 @@ private:
 
 	FTimerHandle WeatherTimer;
 
-	float TotalTimeValue = 0.0f;
-
 private:
 	void OnWeatherTimerEnd();
 
-	void StartWeatherTimer(EWeatherState TargetState);
+	FWeatherEventPayload StartWeatherTimer(EWeatherState TargetState);
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

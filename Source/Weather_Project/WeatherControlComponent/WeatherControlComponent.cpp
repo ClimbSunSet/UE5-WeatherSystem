@@ -40,33 +40,19 @@ void UWeatherControlComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
     UpdateWeatherBlend(DeltaTime);
 }
 
-void UWeatherControlComponent::ChangeWeatherState(EWeatherState NewState, float TimeValue)
+void UWeatherControlComponent::ChangeWeatherState(FWeatherEventPayload WeatherEventPayload)
 {
-	WeatherState = NewState;
-    BlendDuration = TimeValue;
+	WeatherState = WeatherEventPayload.WeatherState;
+    BlendDuration = WeatherEventPayload.BlendTime;
 
-    StartWeatherBlend();
+    StartWeatherBlend(WeatherEventPayload);
 }
 
-void UWeatherControlComponent::StartWeatherBlend()
+void UWeatherControlComponent::StartWeatherBlend(FWeatherEventPayload WeatherEventPayload)
 {
-    
     SetComponentTickEnabled(true);
     
-    if (!IsValid(WeatherDataTable))
-    {
-        return;
-    }
-    
-    const FWeatherStateRow* Row = UWeatherFunctionLibrary::GetWeatherStateData(WeatherState, WeatherDataTable);
-
-    if (Row == nullptr)
-    {
-        SetComponentTickEnabled(false);
-        return;
-    }
-
-    TargetSpawnRate = Row->ParticleSpawnRate;
+    TargetSpawnRate = WeatherEventPayload.ParticleSpawnRate;
     InitialSpawnRate = CurrentSpawnRate;
     ElapsedTime = 0.0f;
 }

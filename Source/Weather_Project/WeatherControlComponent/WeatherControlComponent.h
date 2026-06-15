@@ -7,6 +7,7 @@
 #include "Engine/DataTable.h"
 
 #include "Enums/WeatherState/WeatherState.h"
+#include "Structs/WeatherEventPayload.h"
 
 #include "WeatherControlComponent.generated.h"
 
@@ -33,9 +34,6 @@ private:
 	UPROPERTY()
 	UNiagaraComponent* OwnerNiagaraComponent;
 
-	UPROPERTY(EditDefaultsOnly, Category = "WeatherStateRow")
-	TObjectPtr<UDataTable> WeatherDataTable;
-
 	UPROPERTY()
 	float CurrentSpawnRate = 0.0f;
 
@@ -53,10 +51,10 @@ private:
 
 public:
 	UFUNCTION()
-	void ChangeWeatherState(EWeatherState NewState, float TimeValue);
+	void ChangeWeatherState(FWeatherEventPayload WeatherEventPayload);
 
 private:
-	void StartWeatherBlend();
+	void StartWeatherBlend(FWeatherEventPayload WeatherEventPayload);
 
 	void UpdateWeatherBlend(float DeltaTime);
 };
