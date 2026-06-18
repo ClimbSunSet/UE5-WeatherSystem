@@ -12,6 +12,7 @@
 #include "WeatherControlComponent.generated.h"
 
 class UNiagaraComponent;
+class UCurveFloat;
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent), Blueprintable)
 class WEATHER_PROJECT_API UWeatherControlComponent : public UActorComponent
@@ -34,14 +35,20 @@ private:
 	UPROPERTY()
 	UNiagaraComponent* OwnerNiagaraComponent;
 
-	UPROPERTY()
-	float CurrentSpawnRate = 0.0f;
+	UPROPERTY(EditDefaultsOnly, Category = "CurveFloat")
+	TObjectPtr<UCurveFloat> CurveFloat;
+
+	UPROPERTY(EditAnywhere, Category = "SpawnRateScale")
+	float SpawnRateScale = 2000.0f;
 
 	UPROPERTY()
-	float TargetSpawnRate = 0.0f;
+	float CurrentIntensity = 0.0f;
 
 	UPROPERTY()
-	float InitialSpawnRate = 0.0f;
+	float TargetIntensity = 0.0f;
+
+	UPROPERTY()
+	float InitialIntensity = 0.0f;
 
 	UPROPERTY()
 	float ElapsedTime = 0.0f;

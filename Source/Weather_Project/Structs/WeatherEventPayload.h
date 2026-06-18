@@ -23,5 +23,5 @@ struct FWeatherEventPayload
 	float BlendTime = 0.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float ParticleSpawnRate = 0.0f;
+	float WeatherIntensity = 0.0f;
 };

@@ -22,7 +22,4 @@ struct FWeatherStateRow : public FTableRowBase
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float WeatherIntensity = 0.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float ParticleSpawnRate = 0.0f;
 };

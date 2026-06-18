@@ -67,7 +67,7 @@ FWeatherEventPayload UWeatherComponent::StartWeatherTimer(EWeatherState TargetSt
 		float Max = Row->WeatherBaseDuration * (1.0f + Row->RandomScale);
 		TimeValue = FMath::FRandRange(Min, Max);
 
-		WeatherEventPayload.ParticleSpawnRate = Row->ParticleSpawnRate;
+		WeatherEventPayload.WeatherIntensity = Row->WeatherIntensity;
 		WeatherEventPayload.BlendTime = Row->BlendTime;
 		WeatherEventPayload.TotalTimeValue = TimeValue;
 	}

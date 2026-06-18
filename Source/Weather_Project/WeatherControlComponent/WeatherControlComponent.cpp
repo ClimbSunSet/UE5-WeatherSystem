@@ -8,6 +8,7 @@
 #include "WeatherFunctionLibrary/WeatherFunctionLibrary.h"
 
 #include "NiagaraComponent.h"
+#include "Curves/CurveFloat.h"
 
 UWeatherControlComponent::UWeatherControlComponent()
 {
@@ -52,23 +53,42 @@ void UWeatherControlComponent::StartWeatherBlend(FWeatherEventPayload WeatherEve
 {
     SetComponentTickEnabled(true);
     
-    TargetSpawnRate = WeatherEventPayload.ParticleSpawnRate;
-    InitialSpawnRate = CurrentSpawnRate;
+    TargetIntensity = WeatherEventPayload.WeatherIntensity;
+    InitialIntensity = CurrentIntensity;
     ElapsedTime = 0.0f;
 }
 
 void UWeatherControlComponent::UpdateWeatherBlend(float DeltaTime)
 {
-    ElapsedTime += DeltaTime;
-
-    CurrentSpawnRate = FMath::Lerp(InitialSpawnRate, TargetSpawnRate, ElapsedTime / BlendDuration);
-
-    if (ElapsedTime / BlendDuration >= 1.0f)
+    if (BlendDuration <= 0)
     {
-        CurrentSpawnRate = TargetSpawnRate;
+        CurrentIntensity = TargetIntensity;
 
         SetComponentTickEnabled(false);
     }
+    else
+    {
+        ElapsedTime += DeltaTime;
 
-    OwnerNiagaraComponent->SetVariableFloat(FName("SpawnRate"), CurrentSpawnRate);
+        float Alpha = ElapsedTime / BlendDuration;
+
+        CurrentIntensity = FMath::Lerp(InitialIntensity, TargetIntensity, Alpha);
+
+        if (Alpha >= 1.0f)
+        {
+            CurrentIntensity = TargetIntensity;
+
+            SetComponentTickEnabled(false);
+        }
+    }
+
+    if (!IsValid(CurveFloat))
+    {
+        return;
+    }
+
+    float ParticleSpawnRate = CurveFloat->GetFloatValue(CurrentIntensity);
+    float TotalSpawnRate = ParticleSpawnRate * SpawnRateScale;
+
+    OwnerNiagaraComponent->SetVariableFloat(FName("SpawnRate"), TotalSpawnRate);
 }
