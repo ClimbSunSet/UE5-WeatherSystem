@@ -41,6 +41,7 @@
 
 # Content 폴더: .uasset, .umap만 허용
 /Content/*
+!/Content/**/
 !/Content/**/*.uasset
 !/Content/**/*.umap
 
