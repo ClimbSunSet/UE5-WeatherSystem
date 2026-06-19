@@ -18,10 +18,16 @@ struct FWeatherEventPayload
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float TotalTimeValue = 0.0f;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float BlendTime = 0.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float WindSpeed = 0.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float WeatherIntensity = 0.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float BaseWindDirectionDegrees = 0.0f; // 각도 도 단위
 };

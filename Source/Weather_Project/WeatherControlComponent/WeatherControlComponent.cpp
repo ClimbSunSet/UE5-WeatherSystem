@@ -46,6 +46,8 @@ void UWeatherControlComponent::ChangeWeatherState(FWeatherEventPayload WeatherEv
 	WeatherState = WeatherEventPayload.WeatherState;
     BlendDuration = WeatherEventPayload.BlendTime;
 
+    CurrentWindDirectionDegrees = WeatherEventPayload.BaseWindDirectionDegrees;
+
     StartWeatherBlend(WeatherEventPayload);
 }
 
@@ -55,6 +57,10 @@ void UWeatherControlComponent::StartWeatherBlend(FWeatherEventPayload WeatherEve
     
     TargetIntensity = WeatherEventPayload.WeatherIntensity;
     InitialIntensity = CurrentIntensity;
+
+    TargetWindSpeed = WeatherEventPayload.WindSpeed;
+    InitialWindSpeed = CurrentWindSpeed;
+
     ElapsedTime = 0.0f;
 }
 
@@ -63,6 +69,7 @@ void UWeatherControlComponent::UpdateWeatherBlend(float DeltaTime)
     if (BlendDuration <= 0)
     {
         CurrentIntensity = TargetIntensity;
+        CurrentWindSpeed = TargetWindSpeed;
 
         SetComponentTickEnabled(false);
     }
@@ -73,10 +80,12 @@ void UWeatherControlComponent::UpdateWeatherBlend(float DeltaTime)
         float Alpha = ElapsedTime / BlendDuration;
 
         CurrentIntensity = FMath::Lerp(InitialIntensity, TargetIntensity, Alpha);
+        CurrentWindSpeed = FMath::Lerp(InitialWindSpeed, TargetWindSpeed, Alpha);
 
         if (Alpha >= 1.0f)
         {
             CurrentIntensity = TargetIntensity;
+            CurrentWindSpeed = TargetWindSpeed;
 
             SetComponentTickEnabled(false);
         }
@@ -91,4 +100,7 @@ void UWeatherControlComponent::UpdateWeatherBlend(float DeltaTime)
     float TotalSpawnRate = ParticleSpawnRate * SpawnRateScale;
 
     OwnerNiagaraComponent->SetVariableFloat(FName("SpawnRate"), TotalSpawnRate);
+    OwnerNiagaraComponent->SetVariableFloat(FName("WindSpeed"), CurrentWindSpeed);
+    OwnerNiagaraComponent->SetVariableFloat(FName("WindDirection"), CurrentWindDirectionDegrees);
 }
+

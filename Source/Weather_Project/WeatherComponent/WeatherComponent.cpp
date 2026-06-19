@@ -63,13 +63,21 @@ FWeatherEventPayload UWeatherComponent::StartWeatherTimer(EWeatherState TargetSt
 
 	if (Row != nullptr)
 	{
-		float Min = Row->WeatherBaseDuration * (1.0f - Row->RandomScale);
-		float Max = Row->WeatherBaseDuration * (1.0f + Row->RandomScale);
-		TimeValue = FMath::FRandRange(Min, Max);
+		float MinDuration = Row->BaseDuration * (1.0f - Row->DurationRandomScale);
+		float MaxDuration = Row->BaseDuration * (1.0f + Row->DurationRandomScale);
+		TimeValue = FMath::FRandRange(MinDuration, MaxDuration);
+
+		float MinWindSpeed = Row->BaseWindSpeed * (1.0f - Row->WindRandomScale);
+		float MaxWindSpeed = Row->BaseWindSpeed * (1.0f + Row->WindRandomScale);
+		float WindSpeed = FMath::FRandRange(MinWindSpeed, MaxWindSpeed);
+
+		float WindDirectionDegrees = FMath::FRandRange(0.0f, 360.0f);
 
 		WeatherEventPayload.WeatherIntensity = Row->WeatherIntensity;
 		WeatherEventPayload.BlendTime = Row->BlendTime;
 		WeatherEventPayload.TotalTimeValue = TimeValue;
+		WeatherEventPayload.WindSpeed = WindSpeed;
+		WeatherEventPayload.BaseWindDirectionDegrees = WindDirectionDegrees;
 	}
 	else
 	{
