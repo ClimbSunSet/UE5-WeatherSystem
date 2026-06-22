@@ -46,8 +46,6 @@ void UWeatherControlComponent::ChangeWeatherState(FWeatherEventPayload WeatherEv
 	WeatherState = WeatherEventPayload.WeatherState;
     BlendDuration = WeatherEventPayload.BlendTime;
 
-    CurrentWindDirectionDegrees = WeatherEventPayload.BaseWindDirectionDegrees;
-
     StartWeatherBlend(WeatherEventPayload);
 }
 
@@ -61,6 +59,9 @@ void UWeatherControlComponent::StartWeatherBlend(FWeatherEventPayload WeatherEve
     TargetWindSpeed = WeatherEventPayload.WindSpeed;
     InitialWindSpeed = CurrentWindSpeed;
 
+    TargetWindDirectionDegrees = WeatherEventPayload.BaseWindDirectionDegrees;
+    InitialWindDirectionDegrees = CurrentWindDirectionDegrees;
+
     ElapsedTime = 0.0f;
 }
 
@@ -70,6 +71,7 @@ void UWeatherControlComponent::UpdateWeatherBlend(float DeltaTime)
     {
         CurrentIntensity = TargetIntensity;
         CurrentWindSpeed = TargetWindSpeed;
+        CurrentWindDirectionDegrees = TargetWindDirectionDegrees;
 
         SetComponentTickEnabled(false);
     }
@@ -81,6 +83,7 @@ void UWeatherControlComponent::UpdateWeatherBlend(float DeltaTime)
 
         CurrentIntensity = FMath::Lerp(InitialIntensity, TargetIntensity, Alpha);
         CurrentWindSpeed = FMath::Lerp(InitialWindSpeed, TargetWindSpeed, Alpha);
+        CurrentWindDirectionDegrees = LerpAngleDegrees(InitialWindDirectionDegrees, TargetWindDirectionDegrees, Alpha);
 
         if (Alpha >= 1.0f)
         {
@@ -90,7 +93,7 @@ void UWeatherControlComponent::UpdateWeatherBlend(float DeltaTime)
             SetComponentTickEnabled(false);
         }
     }
-
+    
     if (!IsValid(CurveFloat))
     {
         return;
@@ -102,5 +105,13 @@ void UWeatherControlComponent::UpdateWeatherBlend(float DeltaTime)
     OwnerNiagaraComponent->SetVariableFloat(FName("SpawnRate"), TotalSpawnRate);
     OwnerNiagaraComponent->SetVariableFloat(FName("WindSpeed"), CurrentWindSpeed);
     OwnerNiagaraComponent->SetVariableFloat(FName("WindDirection"), CurrentWindDirectionDegrees);
+}
+
+float UWeatherControlComponent::LerpAngleDegrees(float Initial, float Target, float Alpha) const
+{
+    float DeltaAngle = FMath::FindDeltaAngleDegrees(Initial, Target);
+    float DegreesValue = Initial + DeltaAngle * Alpha;
+    
+    return DegreesValue;
 }
 

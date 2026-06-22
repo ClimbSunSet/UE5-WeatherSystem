@@ -50,9 +50,6 @@ private:
 	UPROPERTY()
 	float InitialIntensity = 0.0f;
 
-	// TODO: Intensity/WindSpeed 블렌딩 로직 중복 -> 범용 Lerp 헬퍼로 분리 예정
-	// TODO: 풍향(BaseWindDirectionDegrees) 보간 추가 - 각도 wrap 때문에 단순 Lerp 금지, LerpAngle 계열 사용
-
 	UPROPERTY()
 	float CurrentWindSpeed = 0.0f;
 
@@ -64,6 +61,12 @@ private:
 
 	UPROPERTY()
 	float CurrentWindDirectionDegrees = 0.0f;
+
+	UPROPERTY()  
+	float TargetWindDirectionDegrees = 0.0f;
+
+	UPROPERTY()
+	float InitialWindDirectionDegrees = 0.0f;
 
 	UPROPERTY()
 	float ElapsedTime = 0.0f;
@@ -79,4 +82,6 @@ private:
 	void StartWeatherBlend(FWeatherEventPayload WeatherEventPayload);
 
 	void UpdateWeatherBlend(float DeltaTime);
+
+	float LerpAngleDegrees(float Initial, float Target, float Alpha) const;
 };
