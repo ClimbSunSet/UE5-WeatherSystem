@@ -41,44 +41,29 @@ private:
 	UPROPERTY(EditAnywhere, Category = "SpawnRateScale")
 	float SpawnRateScale = 2000.0f;
 
-	UPROPERTY()
+	// ========== 강도 ==========
 	float CurrentIntensity = 0.0f;
-
-	UPROPERTY()
 	float TargetIntensity = 0.0f;
-
-	UPROPERTY()
 	float InitialIntensity = 0.0f;
 
-	UPROPERTY()
+	// ========== 풍속 ==========
 	float CurrentWindSpeed = 0.0f;
-
-	UPROPERTY()
 	float TargetWindSpeed = 0.0f;
-
-	UPROPERTY()
 	float InitialWindSpeed = 0.0f;
 
-	UPROPERTY()
+	// ========== 풍향 ==========
 	float CurrentWindDirectionDegrees = 0.0f;
-
-	UPROPERTY()  
 	float TargetWindDirectionDegrees = 0.0f;
-
-	UPROPERTY()
 	float InitialWindDirectionDegrees = 0.0f;
 
-	UPROPERTY()
+	// ========= 블렌드 =========
 	float ElapsedTime = 0.0f;
-
-	UPROPERTY()
 	float BlendDuration = 0.0f;
 
-public:
+private:
 	UFUNCTION()
 	void ChangeWeatherState(FWeatherEventPayload WeatherEventPayload);
 
-private:
 	void StartWeatherBlend(FWeatherEventPayload WeatherEventPayload);
 
 	void UpdateWeatherBlend(float DeltaTime);
